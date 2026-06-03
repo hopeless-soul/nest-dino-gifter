@@ -1,6 +1,6 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, FindOneOptions, Repository } from 'typeorm';
+import { DataSource, EntityManager, FindOneOptions, IsNull, Not, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { HashingService } from '../common/hashing/common/hashing.service';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
@@ -28,7 +28,7 @@ export class UsersService {
         withDeleted: true,
       });
       if (exist) {
-        throw new Error('Username already exists');
+        throw new ConflictException('Username already exists');
       }
 
       const hashedPassword = await this.hashingService.hash(password);
@@ -59,7 +59,7 @@ export class UsersService {
         withDeleted: true,
       });
       if (exist) {
-        throw new Error('Username already exists');
+        throw new ConflictException('Username already exists');
       }
 
       const hashedPassword = await this.hashingService.hash(password);
@@ -83,7 +83,7 @@ export class UsersService {
 
   async findAll(query: FilterUsersQueryDto) {
     const { search, role, isDeleted } = query;
-    const where: any = { deletedAt: undefined };
+    const where: any = { deletedAt: IsNull() };
 
     if (search) {
       where.username = search;
@@ -94,7 +94,7 @@ export class UsersService {
     }
 
     if (isDeleted !== undefined) {
-      where.deletedAt = isDeleted ? null : undefined;
+      where.deletedAt = isDeleted ? Not(IsNull()) : IsNull();
     }
 
     return this.userRepository.find({ where });
@@ -111,7 +111,7 @@ export class UsersService {
   async update(id: string, dto: UpdateAdminUserDto) {
     const user = await this.findOneById(id);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const { username, password, role } = dto;
@@ -129,7 +129,7 @@ export class UsersService {
   async softDeleteAdmin(id: string): Promise<void> {
     const user = await this.findOneById(id);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     user.deletedAt = new Date();
@@ -139,7 +139,7 @@ export class UsersService {
   async restoreAdmin(id: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id }, withDeleted: true }); 
     if (!user) {  
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     user.deletedAt = null;
