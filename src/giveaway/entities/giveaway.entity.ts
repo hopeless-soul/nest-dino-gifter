@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import type { DinoData, TrialData } from '../../common/types';
 import { User } from '../../users/entities/user.entity';
+import { GiveawayCompletionStatus } from '../../common/enums/trial.enum';
 
 @Entity()
 export class Giveaway {
@@ -28,6 +29,9 @@ export class Giveaway {
 
   @Column({ type: 'json', nullable: true, default: null })
   trials: TrialData[] | null;
+
+  @Column({ enum: GiveawayCompletionStatus, default: GiveawayCompletionStatus.NotProcessed }) 
+  completionStatus: GiveawayCompletionStatus;
 
   // Timestamps
   @CreateDateColumn() createdAt: Date;

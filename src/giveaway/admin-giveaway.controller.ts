@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, NotFoundException } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
 import { UpdateGiveawayDto } from './dto/update-giveaway.dto';
@@ -11,6 +12,8 @@ import { UsersService } from '../users/users.service';
 import { toCurrentUserData } from '../auth/types';
 import { User } from '../users/entities/user.entity';
 
+@ApiTags('admin / giveaway')
+@ApiBearerAuth('bearerAuth')
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 @Controller('admin/giveaway')

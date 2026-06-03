@@ -6,6 +6,7 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
+import { ApiTags, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { Auth } from './decorators/auth.decorator';
@@ -14,7 +15,9 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import type { CurrentUserData, Tokens } from './types';
 import type { Request, Response } from 'express';
 import { CreateLocalUserDto } from '../users/dto/create-local-user.dto';
+import { LoginDto } from './dto/login.dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -25,6 +28,7 @@ export class AuthController {
   @Post('login')
   @Auth(AuthType.Local)
   @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: LoginDto })
   async localLogin(
     @CurrentUser() user: CurrentUserData,
     @Res({ passthrough: true }) response: Response,
@@ -45,6 +49,7 @@ export class AuthController {
   @Post('logout')
   @Auth(AuthType.Bearer)
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth('bearerAuth')
   async logout(
     @CurrentUser() user: CurrentUserData,
     @Res({ passthrough: true }) response: Response,

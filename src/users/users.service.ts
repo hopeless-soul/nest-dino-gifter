@@ -114,9 +114,10 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const { username, password, role } = dto;
+    const { username, password, role, apiId } = dto;
     if (username) user.username = username;
     if (password) user.password = await this.hashingService.hash(password);
+    if (apiId) user.apiId = apiId;
     if (role) user.role = role;
 
     return this.userRepository.save(user);

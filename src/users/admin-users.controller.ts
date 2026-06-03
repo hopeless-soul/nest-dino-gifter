@@ -11,6 +11,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthType } from '../auth/enums/auth-type.enum';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { Role } from './enums/role.enum';
@@ -23,6 +24,8 @@ import { FilterUsersQueryDto } from './dto/filter-users-query.dto';
 import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
 
 @Controller('admin/users')
+@ApiTags('admin / users')
+@ApiBearerAuth('bearerAuth')
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 export class AdminUsersController {

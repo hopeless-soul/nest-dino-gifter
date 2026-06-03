@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, HttpStatus, HttpCode } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
 import { UpdateGiveawayDto } from './dto/update-giveaway.dto';
@@ -7,7 +8,10 @@ import { AuthType } from '../auth/enums/auth-type.enum';
 import { Role } from '../users/enums/role.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { CurrentUserData } from '../auth/types';
 
+@ApiTags('giveaway')
+@ApiBearerAuth('bearerAuth')
 @Auth(AuthType.Bearer)
 @Controller('giveaway')
 export class GiveawayController {
@@ -15,13 +19,13 @@ export class GiveawayController {
 
   @Post()
   @Roles(Role.Operator, Role.Admin)
-  create(@CurrentUser() user, @Body() createGiveawayDto: CreateGiveawayDto) {
+  create(@CurrentUser() user: CurrentUserData, @Body() createGiveawayDto: CreateGiveawayDto) {
     return this.giveawayService.create(user, createGiveawayDto);
   }
 
   @Get()
   @Roles(Role.Operator, Role.Admin)
-  findAll(@CurrentUser() user) {
+  findAll(@CurrentUser() user: CurrentUserData) {
     return this.giveawayService.findAll({ where: { creator: user } });
   }
 
@@ -32,7 +36,13 @@ export class GiveawayController {
 
   @Patch(':id')
   @Roles(Role.Operator, Role.Admin)
-  update(@Param('id') id: string, @Body() updateGiveawayDto: UpdateGiveawayDto, @CurrentUser() user) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateGiveawayDto: UpdateGiveawayDto, @CurrentUser() user: CurrentUserData) {
     return this.giveawayService.update(id, updateGiveawayDto, { where: { creator: user } });
+  }
+
+  @Post(':id')
+  @HttpCode(HttpStatus.ACCEPTED)
+  claim(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: CurrentUserData) {
+    this.giveawayService.claim(id, user)
   }
 }

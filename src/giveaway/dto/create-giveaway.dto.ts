@@ -1,16 +1,40 @@
-import { IsBoolean, IsDate, IsJSON, IsOptional } from 'class-validator';
-import { DinoData, TrialData } from '../../common/types';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsDate, IsOptional } from 'class-validator';
+import { TrialType } from '../../common/enums/trial.enum';
+
+export class DinoDataDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  growthLabel: string;
+}
+
+export class TrialDataDto {
+  @ApiProperty({ enum: TrialType })
+  type: TrialType;
+
+  @ApiProperty()
+  data: unknown;
+}
 
 export class CreateGiveawayDto {
-  dino: DinoData;
+  @ApiProperty({ type: DinoDataDto })
+  dino: DinoDataDto;
 
+  @ApiPropertyOptional({ type: Date, nullable: true })
   @IsDate()
   @IsOptional()
   activeAt?: Date | null;
 
+  @ApiPropertyOptional({ type: [TrialDataDto], nullable: true })
   @IsOptional()
-  trials?: TrialData[] | null;
+  trials?: TrialDataDto[] | null;
 
+  @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
   isCanceled?: boolean;
