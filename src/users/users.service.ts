@@ -1,8 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, FindOneOptions, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { HashingService } from '../common/hashing/common/hashing.service';
+import { CreateLocalUserDto } from './dto/create-local-user.dto';
+import { CreateAdminUserDto } from './dto/create-admin-user.dto';
+import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
+import { FilterUsersQueryDto } from './dto/filter-users-query.dto';
 
 @Injectable()
 export class UsersService {
@@ -12,30 +16,104 @@ export class UsersService {
     @InjectDataSource()
     private readonly dataSource: DataSource,
     private readonly hashingService: HashingService,
-  ) {}  
+  ) {}
 
   createFromLocal(dto: CreateLocalUserDto) {}
 
-  createFromAdmin(dto: CreateAdminUserDto) {}
+  createFromAdmin(dto: CreateAdminUserDto) {
+    return this.dataSource.transaction(async (manager: EntityManager) => {
+      const userRepo = manager.getRepository(User);
+      const { username, password, role } = dto;
 
-  async findAll() {}
+      const exist = await userRepo.findOne({
+        where: { username },
+        withDeleted: true,
+      });
+      if (exist) {
+        throw new Error('Username already exists');
+      }
 
-  async findOneById(id: string) {}
+      const hashedPassword = await this.hashingService.hash(password);
+      const user = userRepo.create({
+        username,
+        password: hashedPassword,
+        role,
+      });
 
-  async findOneByUser(username: string) {}
+      try {
+        const saved = await userRepo.save(user);
+        return saved;
+      } catch (error: any) {
+        if (error?.code === '23505') {
+          throw new ConflictException('Email already exists');
+        }
+        throw error;
+      }
+    });
+  }
 
-  async update(id: string, dto: UpdateAdminUserDto) {}
-  
+  async findAll(query: FilterUsersQueryDto) {
+    const { search, role, isDeleted } = query;
+    const where: any = { deletedAt: undefined };
+
+    if (search) {
+      where.username = search;
+    }
+
+    if (role) {
+      where.role = role;
+    }
+
+    if (isDeleted !== undefined) {
+      where.deletedAt = isDeleted ? null : undefined;
+    }
+
+    return this.userRepository.find({ where });
+  }
+
+  async findOneById(id: string) {
+    return this.userRepository.findOne({ where: { id } });
+  }
+
+  async findOneByUsername(username: string) {
+    return this.userRepository.findOne({ where: { username } });
+  }
+
+  async update(id: string, dto: UpdateAdminUserDto) {
+    const user = await this.findOneById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const { username, password, role } = dto;
+    if (username) user.username = username;
+    if (password) user.password = await this.hashingService.hash(password);
+    if (role) user.role = role;
+
+    return this.userRepository.save(user);
+  }
 
   async incrementTokenVersion(id: string): Promise<void> {
-    // await this.userRepository.increment({ id }, 'tokenVersion', 1);
+    await this.userRepository.increment({ id }, 'tokenVersion', 1);
   }
 
   async softDeleteAdmin(id: string): Promise<void> {
-    // const user = await this.findByIdAdmin(id);
-    // user.deletedAt = new Date();
-    // await this.userRepository.save(user);
+    const user = await this.findOneById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    user.deletedAt = new Date();
+    await this.userRepository.save(user);
   }
 
-  async restoreAdmin(id: string): Promise<void> {}
+  async restoreAdmin(id: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id }, withDeleted: true }); 
+    if (!user) {  
+      throw new Error('User not found');
+    }
+
+    user.deletedAt = null;
+    await this.userRepository.save(user);
+  }
 }

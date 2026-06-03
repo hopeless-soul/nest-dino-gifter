@@ -15,6 +15,9 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.Regular })
   role: Role;
 
+  @Column({ default: 0 })
+  tokenVersion: number;
+
   @CreateDateColumn() createdAt: Date;
   @UpdateDateColumn() updatedAt: Date;
   @DeleteDateColumn() deletedAt: Date | null;
