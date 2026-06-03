@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { AuthType } from '../auth/enums/auth-type.enum';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { Role } from './enums/role.enum';
@@ -19,30 +31,51 @@ export class AdminUsersController {
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateAdminUserDto): Promise<AdminUserResponseDto> {
     const user = await this.usersService.createFromAdmin(dto);
-    return plainToInstance(AdminUserResponseDto, user, { excludeExtraneousValues: true });
+    return plainToInstance(AdminUserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get()
-  async findAll(@Query() query: FilterUsersQueryDto): Promise<AdminUserResponseDto[]> {
+  async findAll(
+    @Query() query: FilterUsersQueryDto,
+  ): Promise<AdminUserResponseDto[]> {
     const users = await this.usersService.findAll(query);
-    return users.map((user) => plainToInstance(AdminUserResponseDto, user, { excludeExtraneousValues: true }));
+    return users.map((user) =>
+      plainToInstance(AdminUserResponseDto, user, {
+        excludeExtraneousValues: true,
+      }),
+    );
   }
 
   @Get(':id')
-  async findOne(@Query('id') id: string): Promise<AdminUserResponseDto> {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<AdminUserResponseDto> {
     const user = await this.usersService.findOneById(id);
-    return plainToInstance(AdminUserResponseDto, user, { excludeExtraneousValues: true });
+    return plainToInstance(AdminUserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: CreateAdminUserDto,
+  ): Promise<AdminUserResponseDto> {
+    const user = await this.usersService.update(id, dto);
+    return plainToInstance(AdminUserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async softDelete(@Query('id') id: string): Promise<void> {
+  async softDelete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.usersService.softDeleteAdmin(id);
   }
 
   @Post(':id/restore')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async restore(@Query('id') id: string): Promise<void> {
+  async restore(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.usersService.restoreAdmin(id);
   }
 }
