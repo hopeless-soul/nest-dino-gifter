@@ -8,4 +8,5 @@ export enum GiveawayCompletionStatus {
   NotProcessed = 'not_processed',
   Pending = 'pending',
   Processed = 'processed',
+  Failed = 'failed',
 }

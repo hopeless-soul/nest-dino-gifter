@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { HashingModule } from './common/hashing/common/hashing.module';
 import { AuthModule } from './auth/auth.module';
 import { GiveawayModule } from './giveaway/giveaway.module';
+import { PusherModule } from './pusher/pusher.module';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { GiveawayModule } from './giveaway/giveaway.module';
     }),
     UsersModule,
     DatabaseModule,
-    HashingModule, AuthModule, GiveawayModule,
+    HashingModule, AuthModule, GiveawayModule, PusherModule,
   ],
   controllers: [AppController],
   providers: [AppService],

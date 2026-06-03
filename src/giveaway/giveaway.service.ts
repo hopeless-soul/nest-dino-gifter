@@ -20,6 +20,7 @@ import {
 import { CurrentUserData } from '../auth/types';
 import { User } from '../users/entities/user.entity';
 import { GiveawayCompletionStatus } from '../common/enums/trial.enum';
+import { GiveawayPushService } from './giveaway.gateway';
 
 @Injectable()
 export class GiveawayService {
@@ -28,6 +29,7 @@ export class GiveawayService {
     private readonly giveawayRepository: Repository<Giveaway>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
+    private readonly pushService: GiveawayPushService,
   ) {}
 
   async create(user: CurrentUserData, dto: CreateGiveawayDto) {
@@ -82,6 +84,7 @@ export class GiveawayService {
       const gRepo = manager.getRepository(Giveaway);
       const gw = await gRepo.findOne({
         where: { id, isCanceled: false },
+        relations: { creator: true },
         lock: { mode: 'pessimistic_write' },
       });
       if (!gw) throw new NotFoundException('Giveaway canceled or not found');
@@ -101,7 +104,15 @@ export class GiveawayService {
 
       gw.recepient = u;
       gw.completionStatus = GiveawayCompletionStatus.Pending;
-      return await gRepo.save(gw);
+      const saved = await gRepo.save(gw);
+
+      await this.pushService.emitMoveDino(gw.creator.id, {
+        giveawayId: gw.id,
+        dino: gw.dino,
+        recipientApiId: u.id,
+      });
+
+      return saved;
     });
   }
 }
