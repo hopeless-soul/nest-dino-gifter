@@ -4,9 +4,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
-import { Src\common\hashingModule } from './src/common/hashing/src/common/hashing.module';
-import { Common\hashingModule } from './common/hashing/common/hashing.module';
-import { Common\hashingService } from './common/hashing/common/hashing.service';
+import { HashingModule } from './common/hashing/common/hashing.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -16,9 +15,9 @@ import { Common\hashingService } from './common/hashing/common/hashing.service';
     }),
     UsersModule,
     DatabaseModule,
-    Src\common\hashingModule, Common\hashingModule,
+    HashingModule, AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, Common\hashingService],
+  providers: [AppService],
 })
 export class AppModule {}

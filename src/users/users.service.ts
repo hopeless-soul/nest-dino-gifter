@@ -18,7 +18,36 @@ export class UsersService {
     private readonly hashingService: HashingService,
   ) {}
 
-  createFromLocal(dto: CreateLocalUserDto) {}
+  createFromLocal(dto: CreateLocalUserDto) {
+    return this.dataSource.transaction(async (manager: EntityManager) => {
+      const userRepo = manager.getRepository(User);
+      const { username, password } = dto;
+
+      const exist = await userRepo.findOne({
+        where: { username },
+        withDeleted: true,
+      });
+      if (exist) {
+        throw new Error('Username already exists');
+      }
+
+      const hashedPassword = await this.hashingService.hash(password);
+      const user = userRepo.create({
+        username,
+        password: hashedPassword,
+      });
+
+      try {
+        const saved = await userRepo.save(user);
+        return saved;
+      } catch (error: any) {
+        if (error?.code === '23505') {
+          throw new ConflictException('Email already exists');
+        }
+        throw error;
+      }
+    });
+  }
 
   createFromAdmin(dto: CreateAdminUserDto) {
     return this.dataSource.transaction(async (manager: EntityManager) => {
@@ -71,12 +100,12 @@ export class UsersService {
     return this.userRepository.find({ where });
   }
 
-  async findOneById(id: string) {
-    return this.userRepository.findOne({ where: { id } });
+  async findOneById(id: string, options?: FindOneOptions<User>) {
+    return this.userRepository.findOne({ where: { id }, ...options });
   }
 
-  async findOneByUsername(username: string) {
-    return this.userRepository.findOne({ where: { username } });
+  async findOneByUsername(username: string, options?: FindOneOptions<User>) {
+    return this.userRepository.findOne({ where: { username }, ...options });
   }
 
   async update(id: string, dto: UpdateAdminUserDto) {
