@@ -1,8 +1,10 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Role } from '../enums/role.enum';
+import { Giveaway } from '../../giveaway/entities/giveaway.entity';
 
 @Entity()
 export class User {
+  // Base entity fields
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -18,6 +20,18 @@ export class User {
   @Column({ default: 0 })
   tokenVersion: number;
 
+  // Game fields
+  @Column({ type: 'varchar', nullable: true })
+  apiId: string | null;
+
+  // Giveaway fields
+  @OneToMany(() => Giveaway, giveaway => giveaway.creator)
+  createdGiveaways: Giveaway[];
+
+  @OneToMany(() => Giveaway, giveaway => giveaway.recepient)
+  wonGiveaways: Giveaway[];
+
+  // Timestamps
   @CreateDateColumn() createdAt: Date;
   @UpdateDateColumn() updatedAt: Date;
   @DeleteDateColumn() deletedAt: Date | null;

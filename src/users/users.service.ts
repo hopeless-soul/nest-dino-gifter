@@ -97,7 +97,7 @@ export class UsersService {
       where.deletedAt = isDeleted ? Not(IsNull()) : IsNull();
     }
 
-    return this.userRepository.find({ where });
+    return this.userRepository.find({ where, relations: { createdGiveaways: true, wonGiveaways: true } });
   }
 
   async findOneById(id: string, options?: FindOneOptions<User>) {

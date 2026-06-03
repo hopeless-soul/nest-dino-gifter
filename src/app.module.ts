@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { HashingModule } from './common/hashing/common/hashing.module';
 import { AuthModule } from './auth/auth.module';
+import { GiveawayModule } from './giveaway/giveaway.module';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     DatabaseModule,
-    HashingModule, AuthModule,
+    HashingModule, AuthModule, GiveawayModule,
   ],
   controllers: [AppController],
   providers: [AppService],

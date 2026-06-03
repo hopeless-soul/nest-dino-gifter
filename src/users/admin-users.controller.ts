@@ -20,6 +20,7 @@ import { CreateAdminUserDto } from './dto/create-admin-user.dto';
 import { AdminUserResponseDto } from './dto/admin-user-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { FilterUsersQueryDto } from './dto/filter-users-query.dto';
+import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
 
 @Controller('admin/users')
 @Auth(AuthType.Bearer)
@@ -59,7 +60,7 @@ export class AdminUsersController {
   @Patch(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: CreateAdminUserDto,
+    @Body() dto: UpdateAdminUserDto,
   ): Promise<AdminUserResponseDto> {
     const user = await this.usersService.update(id, dto);
     return plainToInstance(AdminUserResponseDto, user, {
