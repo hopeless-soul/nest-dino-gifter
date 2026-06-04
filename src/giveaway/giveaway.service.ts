@@ -45,21 +45,21 @@ export class GiveawayService {
     const saved = await this.giveawayRepository.save(giveaway);
     return this.giveawayRepository.findOne({
       where: { id: saved.id },
-      relations: { creator: true, recepient: true },
+      relations: { creator: true, recipient: true },
     });
   }
 
   findAll(options?: FindManyOptions<Giveaway>) {
     return this.giveawayRepository.find({
       ...options,
-      relations: { creator: true, recepient: true },
+      relations: { creator: true, recipient: true },
     });
   }
 
   findOne(id: string) {
     const giveaway = this.giveawayRepository.findOne({
       where: { id },
-      relations: { creator: true, recepient: true },
+      relations: { creator: true, recipient: true },
     });
     if (!giveaway) throw new NotFoundException('Giveaway not found');
     return giveaway;
@@ -107,11 +107,11 @@ export class GiveawayService {
       // Load relations within the same transaction (row is already locked above)
       const gw = await gRepo.findOne({
         where: { id },
-        relations: { creator: true, recepient: true },
+        relations: { creator: true, recipient: true },
       });
       if (!gw) throw new NotFoundException('Giveaway canceled or not found');
 
-      if (gw.recepient)
+      if (gw.recipient)
         throw new MethodNotAllowedException('Giveaway has been claimed');
 
       const userRepo = manager.getRepository(User);
@@ -120,7 +120,7 @@ export class GiveawayService {
       });
       if (!u) throw new UnauthorizedException('User is not valid');
 
-      gw.recepient = u;
+      gw.recipient = u;
       gw.completionStatus = GiveawayCompletionStatus.Pending;
       const saved = await gRepo.save(gw);
 

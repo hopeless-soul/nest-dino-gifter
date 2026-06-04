@@ -28,7 +28,7 @@ export class User {
   @OneToMany(() => Giveaway, giveaway => giveaway.creator)
   createdGiveaways: Giveaway[];
 
-  @OneToMany(() => Giveaway, giveaway => giveaway.recepient)
+  @OneToMany(() => Giveaway, giveaway => giveaway.recipient)
   wonGiveaways: Giveaway[];
 
   // Timestamps

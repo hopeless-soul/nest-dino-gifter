@@ -19,7 +19,7 @@ export class GiveawayResponseDto {
   @Expose() deletedAt: Date | null;
   @Expose() completionStatus: GiveawayCompletionStatus;
   @Expose() @Type(() => GiveawayUserDto) creator: GiveawayUserDto;
-  @Expose() @Type(() => GiveawayUserDto) recepient: GiveawayUserDto | null;
+  @Expose() @Type(() => GiveawayUserDto) recipient: GiveawayUserDto | null;
   @Expose() server: string;
   @Expose() slot: string;
 }

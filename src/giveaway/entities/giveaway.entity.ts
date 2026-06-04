@@ -21,7 +21,7 @@ export class Giveaway {
   creator: User;
 
   @ManyToOne(() => User, (user) => user.wonGiveaways, { nullable: true })
-  recepient: User | null;
+  recipient: User | null;
 
   @Column({ type: 'json', nullable: true, default: null })
   trials: TrialData[] | null;
