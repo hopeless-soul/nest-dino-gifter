@@ -1,5 +1,4 @@
 import {
-  ForbiddenException,
   Injectable,
   MethodNotAllowedException,
   NotFoundException,
@@ -14,7 +13,6 @@ import {
   EntityManager,
   FindManyOptions,
   FindOneOptions,
-  FindOptionsWhere,
   Repository,
 } from 'typeorm';
 import { CurrentUserData } from '../auth/types';
@@ -42,15 +40,25 @@ export class GiveawayService {
       trials,
     });
 
-    return await this.giveawayRepository.save(giveaway);
+    const saved = await this.giveawayRepository.save(giveaway);
+    return this.giveawayRepository.findOne({
+      where: { id: saved.id },
+      relations: { creator: true, recepient: true },
+    });
   }
 
   findAll(options?: FindManyOptions<Giveaway>) {
-    return this.giveawayRepository.find({ ...options });
+    return this.giveawayRepository.find({
+      ...options,
+      relations: { creator: true, recepient: true },
+    });
   }
 
   findOne(id: string) {
-    const giveaway = this.giveawayRepository.findOne({ where: { id } });
+    const giveaway = this.giveawayRepository.findOne({
+      where: { id },
+      relations: { creator: true, recepient: true },
+    });
     if (!giveaway) throw new NotFoundException('Giveaway not found');
     return giveaway;
   }
@@ -84,7 +92,7 @@ export class GiveawayService {
       const gRepo = manager.getRepository(Giveaway);
       const gw = await gRepo.findOne({
         where: { id, isCanceled: false },
-        relations: { creator: true },
+        relations: { creator: true, recepient: true },
         lock: { mode: 'pessimistic_write' },
       });
       if (!gw) throw new NotFoundException('Giveaway canceled or not found');
