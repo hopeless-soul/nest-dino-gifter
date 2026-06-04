@@ -29,6 +29,11 @@ export class GiveawayController {
     return this.giveawayService.findAll({ where: { creator: user } });
   }
 
+  @Get('won')
+  findWon(@CurrentUser() user: CurrentUserData) {
+    return this.giveawayService.findAll({ where: { recepient: { id: user.id } } });
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.giveawayService.findOne(id);

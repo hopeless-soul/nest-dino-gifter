@@ -15,6 +15,54 @@
         ]
       }
     },
+    "/users/me": {
+      "get": {
+        "operationId": "UsersController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/users": {
+      "patch": {
+        "operationId": "UsersController_patchMe",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
     "/admin/users": {
       "post": {
         "operationId": "AdminUsersController_create",
@@ -322,6 +370,25 @@
         ]
       }
     },
+    "/giveaway/won": {
+      "get": {
+        "operationId": "GiveawayController_findWon",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "giveaway"
+        ]
+      }
+    },
     "/giveaway/{id}": {
       "get": {
         "operationId": "GiveawayController_findOne",
@@ -548,6 +615,20 @@
           "admin / giveaway"
         ]
       }
+    },
+    "/pusher/auth": {
+      "post": {
+        "operationId": "PusherController_auth",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pusher"
+        ]
+      }
     }
   },
   "info": {
@@ -567,6 +648,10 @@
       }
     },
     "schemas": {
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {}
+      },
       "CreateAdminUserDto": {
         "type": "object",
         "properties": {
@@ -653,12 +738,20 @@
           },
           "growthLabel": {
             "type": "string"
+          },
+          "server": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "string"
           }
         },
         "required": [
           "id",
           "name",
-          "growthLabel"
+          "growthLabel",
+          "server",
+          "slot"
         ]
       },
       "TrialDataDto": {
@@ -701,6 +794,12 @@
           },
           "isCanceled": {
             "type": "boolean"
+          },
+          "server": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "string"
           }
         },
         "required": [
@@ -727,6 +826,12 @@
           },
           "isCanceled": {
             "type": "boolean"
+          },
+          "server": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "string"
           }
         }
       }

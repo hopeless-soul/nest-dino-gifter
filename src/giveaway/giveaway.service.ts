@@ -31,13 +31,15 @@ export class GiveawayService {
   ) {}
 
   async create(user: CurrentUserData, dto: CreateGiveawayDto) {
-    const { dino, activeAt, trials, isCanceled } = dto;
+    const { dino, activeAt, trials, isCanceled, server, slot } = dto;
     const giveaway = this.giveawayRepository.create({
       dino,
       activeAt,
       isCanceled,
       creator: user,
       trials,
+      server,
+      slot,
     });
 
     const saved = await this.giveawayRepository.save(giveaway);
@@ -90,23 +92,31 @@ export class GiveawayService {
   async claim(id: string, user: CurrentUserData) {
     return await this.dataSource.transaction(async (manager: EntityManager) => {
       const gRepo = manager.getRepository(Giveaway);
-      const gw = await gRepo.findOne({
+
+      // Lock without joins — PostgreSQL forbids FOR UPDATE on the nullable side of a LEFT JOIN
+      const locked = await gRepo.findOne({
         where: { id, isCanceled: false },
-        relations: { creator: true, recepient: true },
         lock: { mode: 'pessimistic_write' },
       });
-      if (!gw) throw new NotFoundException('Giveaway canceled or not found');
+      if (!locked) throw new NotFoundException('Giveaway canceled or not found');
 
       const now = new Date();
-      if (gw.activeAt && now < gw.activeAt)
+      if (locked.activeAt && now < locked.activeAt)
         throw new MethodNotAllowedException('Giveaway has not started yet');
+
+      // Load relations within the same transaction (row is already locked above)
+      const gw = await gRepo.findOne({
+        where: { id },
+        relations: { creator: true, recepient: true },
+      });
+      if (!gw) throw new NotFoundException('Giveaway canceled or not found');
 
       if (gw.recepient)
         throw new MethodNotAllowedException('Giveaway has been claimed');
 
       const userRepo = manager.getRepository(User);
       const u = await userRepo.findOne({
-        where: { id: user.id, deletedAt: undefined },
+        where: { id: user.id },
       });
       if (!u) throw new UnauthorizedException('User is not valid');
 
@@ -118,6 +128,8 @@ export class GiveawayService {
         giveawayId: gw.id,
         dino: gw.dino,
         recipientApiId: u.id,
+        server: gw.server,
+        slot: gw.slot,
       });
 
       return saved;

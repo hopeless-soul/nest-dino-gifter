@@ -6,6 +6,8 @@ export interface MoveDinoPayload {
   giveawayId: string;
   dino: DinoData;
   recipientApiId: string;
+  server: string | null;
+  slot: string | null;
 }
 
 @Injectable()

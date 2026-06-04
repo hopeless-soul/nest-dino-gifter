@@ -26,6 +26,12 @@ export class Giveaway {
   @Column({ type: 'json', nullable: true, default: null })
   trials: TrialData[] | null;
 
+  @Column({ type: 'varchar', nullable: true, default: null })
+  server: string | null;
+
+  @Column({ type: 'varchar', nullable: true, default: null })
+  slot: string | null;
+
   @Column({ enum: GiveawayCompletionStatus, default: GiveawayCompletionStatus.NotProcessed }) 
   completionStatus: GiveawayCompletionStatus;
 
