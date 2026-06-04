@@ -76,11 +76,12 @@ export class GiveawayService {
     });
     if (!giveaway) throw new NotFoundException('Giveaway not found');
 
-    const { dino, activeAt, trials, isCanceled } = dto;
+    const { dino, activeAt, trials, isCanceled, completionStatus } = dto;
     if (dino) giveaway.dino = dino;
     if (activeAt) giveaway.activeAt = activeAt;
     if (trials) giveaway.trials = trials;
     if (isCanceled !== undefined) giveaway.isCanceled = isCanceled;
+    if (completionStatus !== undefined) giveaway.completionStatus = completionStatus;
 
     return this.giveawayRepository.save(giveaway);
   }
