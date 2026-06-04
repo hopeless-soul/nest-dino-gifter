@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PusherService } from '../pusher/pusher.service';
 import type { DinoData } from '../common/types';
 
-export interface MoveDinoPayload {
+export interface GiftDinoPayload {
   giveawayId: string;
   dino: DinoData;
   recipientApiId: string;
+  recipientId: string;
   server: string | null;
   slot: string | null;
 }
@@ -14,7 +15,7 @@ export interface MoveDinoPayload {
 export class GiveawayPushService {
   constructor(private readonly pusher: PusherService) {}
 
-  emitMoveDino(creatorId: string, payload: MoveDinoPayload) {
-    return this.pusher.trigger(`private-user-${creatorId}`, 'move_dino', payload);
+  emitGiftDino(creatorId: string, payload: GiftDinoPayload) {
+    return this.pusher.trigger(`private-user-${creatorId}`, 'gift_dino', payload);
   }
 }

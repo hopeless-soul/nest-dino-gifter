@@ -124,10 +124,13 @@ export class GiveawayService {
       gw.completionStatus = GiveawayCompletionStatus.Pending;
       const saved = await gRepo.save(gw);
 
-      await this.pushService.emitMoveDino(gw.creator.id, {
+      if (!u.apiId) throw new NotFoundException('User\s api ID is not valid')
+
+      await this.pushService.emitGiftDino(gw.creator.id, {
         giveawayId: gw.id,
         dino: gw.dino,
-        recipientApiId: u.id,
+        recipientApiId: u.apiId,
+        recipientId: u.id,
         server: gw.server,
         slot: gw.slot,
       });

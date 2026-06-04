@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, ParseUUIDPipe, HttpStatus, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
@@ -47,7 +47,7 @@ export class GiveawayController {
 
   @Post(':id')
   @HttpCode(HttpStatus.ACCEPTED)
-  claim(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: CurrentUserData) {
-    this.giveawayService.claim(id, user)
+  async claim(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: CurrentUserData) {
+    return this.giveawayService.claim(id, user)
   }
 }
