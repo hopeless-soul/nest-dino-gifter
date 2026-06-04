@@ -117,7 +117,7 @@ export class UsersService {
     const { username, password, role, apiId } = dto;
     if (username) user.username = username;
     if (password) user.password = await this.hashingService.hash(password);
-    if (apiId) user.apiId = apiId;
+    if (apiId !== undefined) user.apiId = apiId;
     if (role) user.role = role;
 
     return this.userRepository.save(user);

@@ -81,7 +81,11 @@ export class GiveawayService {
     if (activeAt) giveaway.activeAt = activeAt;
     if (trials) giveaway.trials = trials;
     if (isCanceled !== undefined) giveaway.isCanceled = isCanceled;
-    if (completionStatus !== undefined) giveaway.completionStatus = completionStatus;
+    if (completionStatus !== undefined &&
+        !(giveaway.completionStatus === GiveawayCompletionStatus.Processed &&
+          completionStatus === GiveawayCompletionStatus.Failed)) {
+      giveaway.completionStatus = completionStatus;
+    }
 
     return this.giveawayRepository.save(giveaway);
   }
