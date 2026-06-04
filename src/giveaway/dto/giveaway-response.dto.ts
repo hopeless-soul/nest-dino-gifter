@@ -20,4 +20,6 @@ export class GiveawayResponseDto {
   @Expose() completionStatus: GiveawayCompletionStatus;
   @Expose() @Type(() => GiveawayUserDto) creator: GiveawayUserDto;
   @Expose() @Type(() => GiveawayUserDto) recepient: GiveawayUserDto | null;
+  @Expose() server: string;
+  @Expose() slot: string;
 }

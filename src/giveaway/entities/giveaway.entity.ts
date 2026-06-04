@@ -11,10 +11,6 @@ export class Giveaway {
   @Column({ type: 'json' })
   dino: DinoData;
 
-  // Note: calculated based on `recepient` filed
-  // @Column({ default: false })
-  // redeemed: boolean;
-
   @Column({ default: false })
   isCanceled: boolean;
 

@@ -4,6 +4,8 @@ export interface DinoData {
   id: string,
   name: string,
   growthLabel: string,
+  server: string,
+  slot: string,
 }
 
 export interface TrialData {
