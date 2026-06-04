@@ -71,8 +71,8 @@ export class GiveawayService {
     options?: FindOneOptions<Giveaway>,
   ) {
     const giveaway = await this.giveawayRepository.findOne({
-      where: { id },
       ...options,
+      where: { id, ...(options?.where as object | undefined) },
     });
     if (!giveaway) throw new NotFoundException('Giveaway not found');
 
@@ -80,7 +80,7 @@ export class GiveawayService {
     if (dino) giveaway.dino = dino;
     if (activeAt) giveaway.activeAt = activeAt;
     if (trials) giveaway.trials = trials;
-    if (isCanceled) giveaway.isCanceled = isCanceled;
+    if (isCanceled !== undefined) giveaway.isCanceled = isCanceled;
 
     return this.giveawayRepository.save(giveaway);
   }

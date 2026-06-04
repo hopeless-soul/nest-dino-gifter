@@ -26,7 +26,7 @@ export class GiveawayController {
   @Get()
   @Roles(Role.Operator, Role.Admin)
   findAll(@CurrentUser() user: CurrentUserData) {
-    return this.giveawayService.findAll({ where: { creator: user } });
+    return this.giveawayService.findAll({ where: { creator: user }, order: { createdAt: 'DESC' } });
   }
 
   @Get('won')
