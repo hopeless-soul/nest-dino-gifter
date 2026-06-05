@@ -18,12 +18,12 @@ export class UsersController {
   async getMe(@CurrentUser() user: CurrentUserData) {
     const found = await this.usersService.findOneById(user.id);
     if (!found) throw new NotFoundException('User not found');
-    return { id: found.id, username: found.username, role: found.role, apiId: found.apiId };
+    return { id: found.id, username: found.username, role: found.role, apiId: found.apiId, isPublic: found.isPublic };
   }
 
   @Patch()
   async patchMe(@CurrentUser() user: CurrentUserData, @Body() dto: UpdateUserDto) {
     const updated = await this.usersService.update(user.id, dto);
-    return { id: updated.id, username: updated.username, role: updated.role, apiId: updated.apiId };
+    return { id: updated.id, username: updated.username, role: updated.role, apiId: updated.apiId, isPublic: updated.isPublic };
   }
 }

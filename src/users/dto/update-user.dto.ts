@@ -1,6 +1,11 @@
-import { IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDto {
+  @IsOptional()
   @IsString()
-  apiId: string;
+  apiId?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isPublic?: boolean;
 }

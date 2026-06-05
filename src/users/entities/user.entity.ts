@@ -20,6 +20,9 @@ export class User {
   @Column({ default: 0 })
   tokenVersion: number;
 
+  @Column({ default: true })
+  isPublic: boolean;
+
   // Game fields
   @Column({ type: 'varchar', nullable: true })
   apiId: string | null;

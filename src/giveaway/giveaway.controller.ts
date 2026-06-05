@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, ParseUUIDPipe, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, ParseUUIDPipe, HttpStatus, HttpCode, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
 import { UpdateGiveawayDto } from './dto/update-giveaway.dto';
+import { SearchGiveawayQueryDto } from './dto/search-giveaway-query.dto';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { AuthType } from '../auth/enums/auth-type.enum';
 import { Role } from '../users/enums/role.enum';
@@ -32,6 +33,12 @@ export class GiveawayController {
   @Get('won')
   findWon(@CurrentUser() user: CurrentUserData) {
     return this.giveawayService.findAll({ where: { recipient: { id: user.id } } });
+  }
+
+  @Get('search')
+  @Auth(AuthType.None)
+  searchPublic(@Query() query: SearchGiveawayQueryDto) {
+    return this.giveawayService.searchPublic(query.usernameSearch);
   }
 
   @Get(':id')

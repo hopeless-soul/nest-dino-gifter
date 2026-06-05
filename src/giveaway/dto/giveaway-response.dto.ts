@@ -7,6 +7,7 @@ class GiveawayUserDto {
   @Expose() username: string;
   @Expose() role: string;
   @Expose() apiId: string | null;
+  @Expose() isPublic: boolean;
 }
 
 export class GiveawayResponseDto {

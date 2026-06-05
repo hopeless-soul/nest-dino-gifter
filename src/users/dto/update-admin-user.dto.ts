@@ -4,5 +4,5 @@ import { IsOptional } from "class-validator";
 
 export class UpdateAdminUserDto extends PartialType(CreateAdminUserDto) {
   @IsOptional()
-  apiId: string;
+  apiId?: string;
 }

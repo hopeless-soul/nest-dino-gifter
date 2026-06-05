@@ -90,6 +90,19 @@ export class GiveawayService {
     return this.giveawayRepository.save(giveaway);
   }
 
+  searchPublic(usernameSearch: string) {
+    return this.giveawayRepository
+      .createQueryBuilder('giveaway')
+      .leftJoinAndSelect('giveaway.creator', 'creator')
+      .leftJoinAndSelect('giveaway.recipient', 'recipient')
+      .where('giveaway.isCanceled = :isCanceled', { isCanceled: false })
+      .andWhere('giveaway.recipientId IS NULL')
+      .andWhere('creator.username = :username', { username: usernameSearch })
+      .andWhere('creator.isPublic = :isPublic', { isPublic: true })
+      .orderBy('giveaway.createdAt', 'DESC')
+      .getMany();
+  }
+
   remove(id: string) {
     return this.giveawayRepository.delete(id);
   }

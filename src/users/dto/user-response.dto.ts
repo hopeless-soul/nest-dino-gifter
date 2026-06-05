@@ -12,6 +12,8 @@ export class UserResponseDto {
   @Expose()
   apiId: string | null;
   @Expose()
+  isPublic: boolean;
+  @Expose()
   @Type(() => GiveawayResponseDto)
   createdGiveaways: GiveawayResponseDto[];
   @Expose()
