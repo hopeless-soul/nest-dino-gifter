@@ -18,8 +18,11 @@ async function createApp(): Promise<Express> {
     { logger: ['error', 'warn'] },
   );
 
+  console.log('[CORS] FRONTEND_URL =', process.env.FRONTEND_URL);
   nestApp.enableCors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
+    origin: (_origin: string, callback: (err: Error | null, allow?: string) => void) => {
+      callback(null, process.env.FRONTEND_URL ?? 'http://localhost:3000');
+    },
     credentials: true,
   });
 
@@ -32,3 +35,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const app = await createApp();
   app(req as any, res as any);
 }
+
