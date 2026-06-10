@@ -14,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   ) {
     super({
       // Combine multiple JWT extraction methods: from cookies and from Authorization header
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken([
+      jwtFromRequest: ExtractJwt.fromExtractors([
         JwtStrategy.extractJwtFromCookies,
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
