@@ -44,10 +44,10 @@ export class GiveawayService {
     });
 
     const saved = await this.giveawayRepository.save(giveaway);
-    return this.giveawayRepository.findOne({
+    return (await this.giveawayRepository.findOne({
       where: { id: saved.id },
       relations: { creator: true, recipient: true },
-    }) as Promise<Giveaway>;
+    }))!;
   }
 
   findAll(options?: FindManyOptions<Giveaway>): Promise<Giveaway[]> {
