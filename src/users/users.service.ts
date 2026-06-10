@@ -156,25 +156,16 @@ export class UsersService {
   }
 
   async softDeleteAdmin(id: string): Promise<void> {
-    const user = await this.findOneById(id);
-    if (!user) {
+    const result = await this.userRepository.softDelete(id);
+    if (!result.affected) {
       throw new NotFoundException('User not found');
     }
-
-    user.deletedAt = new Date();
-    await this.userRepository.save(user);
   }
 
   async restoreAdmin(id: string): Promise<void> {
-    const user = await this.userRepository.findOne({
-      where: { id },
-      withDeleted: true,
-    });
-    if (!user) {
+    const result = await this.userRepository.restore(id);
+    if (!result.affected) {
       throw new NotFoundException('User not found');
     }
-
-    user.deletedAt = null;
-    await this.userRepository.save(user);
   }
 }
