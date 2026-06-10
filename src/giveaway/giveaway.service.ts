@@ -56,8 +56,8 @@ export class GiveawayService {
     });
   }
 
-  findOne(id: string) {
-    const giveaway = this.giveawayRepository.findOne({
+  async findOne(id: string): Promise<Giveaway> {
+    const giveaway = await this.giveawayRepository.findOne({
       where: { id },
       relations: { creator: true, recipient: true },
     });
