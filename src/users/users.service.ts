@@ -8,6 +8,7 @@ import {
   DataSource,
   EntityManager,
   FindOneOptions,
+  FindOptionsWhere,
   IsNull,
   Not,
   Repository,
@@ -95,7 +96,7 @@ export class UsersService {
 
   async findAll(query: FilterUsersQueryDto) {
     const { search, role, isDeleted } = query;
-    const where: any = { deletedAt: IsNull() };
+    const where: FindOptionsWhere<User> = { deletedAt: IsNull() };
 
     if (search) {
       where.username = search;
