@@ -6,8 +6,9 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { TokensResponseDto } from './dto/tokens-response.dto';
 import { ConfigService } from '@nestjs/config';
 import { Auth } from './decorators/auth.decorator';
 import { AuthType } from './enums/auth-type.enum';
@@ -29,6 +30,8 @@ export class AuthController {
   @Auth(AuthType.Local)
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: LoginDto })
+  @ApiResponse({ status: 200, type: TokensResponseDto })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async localLogin(
     @CurrentUser() user: CurrentUserData,
     @Res({ passthrough: true }) response: Response,
@@ -42,6 +45,9 @@ export class AuthController {
   @Post('register')
   @Auth(AuthType.None)
   @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({ status: 201, description: 'User registered successfully' })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 409, description: 'Username already taken' })
   async localRegister(@Body() dto: CreateLocalUserDto): Promise<void> {
     await this.authService.localRegister(dto);
   }
@@ -50,6 +56,8 @@ export class AuthController {
   @Auth(AuthType.Bearer)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth('bearerAuth')
+  @ApiResponse({ status: 204, description: 'Logged out successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async logout(
     @CurrentUser() user: CurrentUserData,
     @Res({ passthrough: true }) response: Response,

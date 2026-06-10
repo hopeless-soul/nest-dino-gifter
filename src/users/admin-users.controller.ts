@@ -11,7 +11,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { AuthType } from '../auth/enums/auth-type.enum';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { Role } from './enums/role.enum';
@@ -33,6 +33,11 @@ export class AdminUsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({ status: 201, type: AdminUserResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 409, description: 'Username already taken' })
   async create(@Body() dto: CreateAdminUserDto): Promise<AdminUserResponseDto> {
     const user = await this.usersService.createFromAdmin(dto);
     return plainToInstance(AdminUserResponseDto, user, {
@@ -41,6 +46,9 @@ export class AdminUsersController {
   }
 
   @Get()
+  @ApiResponse({ status: 200, type: AdminUserResponseDto, isArray: true })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   async findAll(
     @Query() query: FilterUsersQueryDto,
   ): Promise<AdminUserResponseDto[]> {
@@ -53,6 +61,10 @@ export class AdminUsersController {
   }
 
   @Get(':id')
+  @ApiResponse({ status: 200, type: AdminUserResponseDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<AdminUserResponseDto> {
     const user = await this.usersService.findOneById(id);
     return plainToInstance(AdminUserResponseDto, user, {
@@ -61,6 +73,11 @@ export class AdminUsersController {
   }
 
   @Patch(':id')
+  @ApiResponse({ status: 200, type: AdminUserResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateAdminUserDto,
@@ -73,12 +90,20 @@ export class AdminUsersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiResponse({ status: 204, description: 'User soft-deleted' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async softDelete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.usersService.softDeleteAdmin(id);
   }
 
   @Post(':id/restore')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiResponse({ status: 204, description: 'User restored' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async restore(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.usersService.restoreAdmin(id);
   }

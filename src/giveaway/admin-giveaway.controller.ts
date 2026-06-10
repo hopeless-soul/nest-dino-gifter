@@ -9,7 +9,7 @@ import {
   ParseUUIDPipe,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
 import { UpdateGiveawayDto } from './dto/update-giveaway.dto';
@@ -37,6 +37,10 @@ export class AdminGiveawayController {
   ) {}
 
   @Post()
+  @ApiResponse({ status: 201, type: GiveawayResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   async createForCurrentUser(
     @CurrentUser() user: CurrentUserData,
     @Body() createGiveawayDto: CreateGiveawayDto,
@@ -48,6 +52,11 @@ export class AdminGiveawayController {
   }
 
   @Post(':id')
+  @ApiResponse({ status: 201, type: GiveawayResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async createForSpecificUser(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() createGiveawayDto: CreateGiveawayDto,
@@ -66,6 +75,9 @@ export class AdminGiveawayController {
   }
 
   @Get()
+  @ApiResponse({ status: 200, type: GiveawayResponseDto, isArray: true })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   async findAll(): Promise<GiveawayResponseDto[]> {
     const gws = await this.giveawayService.findAll();
     return gws.map((gw) =>
@@ -76,6 +88,10 @@ export class AdminGiveawayController {
   }
 
   @Get(':id')
+  @ApiResponse({ status: 200, type: GiveawayResponseDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Giveaway not found' })
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GiveawayResponseDto> {
@@ -86,6 +102,11 @@ export class AdminGiveawayController {
   }
 
   @Patch(':id')
+  @ApiResponse({ status: 200, type: GiveawayResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Giveaway not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateGiveawayDto: UpdateGiveawayDto,

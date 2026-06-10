@@ -10,7 +10,7 @@ import {
   HttpCode,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
 import { UpdateGiveawayDto } from './dto/update-giveaway.dto';
@@ -34,6 +34,10 @@ export class GiveawayController {
   @Post()
   @Roles(Role.Operator, Role.Admin)
   @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({ status: 201, type: GiveawayResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   async create(
     @CurrentUser() user: CurrentUserData,
     @Body() createGiveawayDto: CreateGiveawayDto,
@@ -46,6 +50,9 @@ export class GiveawayController {
 
   @Get()
   @Roles(Role.Operator, Role.Admin)
+  @ApiResponse({ status: 200, type: GiveawayResponseDto, isArray: true })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   async findAll(
     @CurrentUser() user: CurrentUserData,
   ): Promise<GiveawayResponseDto[]> {
@@ -61,6 +68,8 @@ export class GiveawayController {
   }
 
   @Get('won')
+  @ApiResponse({ status: 200, type: GiveawayResponseDto, isArray: true })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findWon(
     @CurrentUser() user: CurrentUserData,
   ): Promise<GiveawayResponseDto[]> {
@@ -76,6 +85,7 @@ export class GiveawayController {
 
   @Get('search')
   @Auth(AuthType.None)
+  @ApiResponse({ status: 200, type: GiveawayResponseDto, isArray: true })
   async searchPublic(@Query() query: SearchGiveawayQueryDto) {
     const gws = await this.giveawayService.searchPublic(query.usernameSearch);
     return gws.map((gw) =>
@@ -86,6 +96,9 @@ export class GiveawayController {
   }
 
   @Get(':id')
+  @ApiResponse({ status: 200, type: GiveawayResponseDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Giveaway not found' })
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GiveawayResponseDto> {
@@ -97,6 +110,11 @@ export class GiveawayController {
 
   @Patch(':id')
   @Roles(Role.Operator, Role.Admin)
+  @ApiResponse({ status: 200, type: GiveawayResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Giveaway not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateGiveawayDto: UpdateGiveawayDto,
@@ -112,6 +130,9 @@ export class GiveawayController {
 
   @Post(':id')
   @HttpCode(HttpStatus.ACCEPTED)
+  @ApiResponse({ status: 202, type: GiveawayResponseDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Giveaway not found' })
   async claim(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: CurrentUserData,
