@@ -1,12 +1,24 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, FindOneOptions, IsNull, Not, Repository } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  FindOneOptions,
+  IsNull,
+  Not,
+  Repository,
+} from 'typeorm';
 import { User } from './entities/user.entity';
 import { HashingService } from '../common/hashing/common/hashing.service';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
 import { CreateAdminUserDto } from './dto/create-admin-user.dto';
 import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
 import { FilterUsersQueryDto } from './dto/filter-users-query.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -97,7 +109,10 @@ export class UsersService {
       where.deletedAt = isDeleted ? Not(IsNull()) : IsNull();
     }
 
-    return this.userRepository.find({ where, relations: { createdGiveaways: true, wonGiveaways: true } });
+    return this.userRepository.find({
+      where,
+      relations: { createdGiveaways: true, wonGiveaways: true },
+    });
   }
 
   async findOneById(id: string, options?: FindOneOptions<User>) {
@@ -106,6 +121,15 @@ export class UsersService {
 
   async findOneByUsername(username: string, options?: FindOneOptions<User>) {
     return this.userRepository.findOne({ where: { username }, ...options });
+  }
+
+  async updateSelf(id: string, dto: UpdateUserDto): Promise<User> {
+    const user = await this.findOneById(id);
+    if (!user) throw new NotFoundException('User not found');
+    if (dto.apiId !== undefined)
+      user.apiId = dto.apiId === '' ? null : dto.apiId;
+    if (dto.isPublic !== undefined) user.isPublic = dto.isPublic;
+    return this.userRepository.save(user);
   }
 
   async update(id: string, dto: UpdateAdminUserDto) {
@@ -139,8 +163,11 @@ export class UsersService {
   }
 
   async restoreAdmin(id: string): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { id }, withDeleted: true }); 
-    if (!user) {  
+    const user = await this.userRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
+    if (!user) {
       throw new NotFoundException('User not found');
     }
 

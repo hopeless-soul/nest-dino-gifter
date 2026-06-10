@@ -1,4 +1,10 @@
-import { Body, Controller, Get, NotFoundException, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Patch,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthType } from '../auth/enums/auth-type.enum';
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -18,12 +24,27 @@ export class UsersController {
   async getMe(@CurrentUser() user: CurrentUserData) {
     const found = await this.usersService.findOneById(user.id);
     if (!found) throw new NotFoundException('User not found');
-    return { id: found.id, username: found.username, role: found.role, apiId: found.apiId, isPublic: found.isPublic };
+    return {
+      id: found.id,
+      username: found.username,
+      role: found.role,
+      apiId: found.apiId,
+      isPublic: found.isPublic,
+    };
   }
 
   @Patch()
-  async patchMe(@CurrentUser() user: CurrentUserData, @Body() dto: UpdateUserDto) {
-    const updated = await this.usersService.update(user.id, dto);
-    return { id: updated.id, username: updated.username, role: updated.role, apiId: updated.apiId, isPublic: updated.isPublic };
+  async patchMe(
+    @CurrentUser() user: CurrentUserData,
+    @Body() dto: UpdateUserDto,
+  ) {
+    const updated = await this.usersService.updateSelf(user.id, dto);
+    return {
+      id: updated.id,
+      username: updated.username,
+      role: updated.role,
+      apiId: updated.apiId,
+      isPublic: updated.isPublic,
+    };
   }
 }
