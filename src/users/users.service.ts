@@ -119,7 +119,7 @@ export class UsersService {
     if (password) user.password = await this.hashingService.hash(password);
     if (apiId !== undefined) user.apiId = apiId === '' ? null : apiId;
     if (role) user.role = role;
-    if ((dto as any).isPublic !== undefined) user.isPublic = (dto as any).isPublic;
+    if (dto.isPublic !== undefined) user.isPublic = dto.isPublic;
 
     return this.userRepository.save(user);
   }

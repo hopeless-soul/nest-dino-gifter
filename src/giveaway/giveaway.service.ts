@@ -79,16 +79,16 @@ export class GiveawayService {
 
     const { dino, activeAt, trials, isCanceled, completionStatus } = dto;
     if (dino) giveaway.dino = dino;
-    if (activeAt) giveaway.activeAt = activeAt;
-    if (trials) giveaway.trials = trials;
+    if (activeAt !== undefined) giveaway.activeAt = activeAt;
+    if (trials !== undefined) giveaway.trials = trials;
     if (isCanceled !== undefined) giveaway.isCanceled = isCanceled;
-    if (
-      completionStatus !== undefined &&
-      !(
-        giveaway.completionStatus === GiveawayCompletionStatus.Processed &&
-        completionStatus === GiveawayCompletionStatus.Failed
-      )
-    ) {
+    
+    // Processed is terminal — allow Failed only as a forward transition, not a rollback
+    const wouldRegressFromProcessedToFailed =
+      giveaway.completionStatus === GiveawayCompletionStatus.Processed &&
+      completionStatus === GiveawayCompletionStatus.Failed;
+
+    if (completionStatus !== undefined && !wouldRegressFromProcessedToFailed) {
       giveaway.completionStatus = completionStatus;
     }
 
