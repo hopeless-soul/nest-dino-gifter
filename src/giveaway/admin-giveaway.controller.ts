@@ -65,7 +65,7 @@ export class AdminGiveawayController {
     if (!user) throw new NotFoundException('User not found');
     if (user.deletedAt !== null)
       throw new NotFoundException('Account is inactive');
-    const gw = this.giveawayService.create(
+    const gw = await this.giveawayService.create(
       toCurrentUserData(user),
       createGiveawayDto,
     );
