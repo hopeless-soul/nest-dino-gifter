@@ -12,6 +12,8 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { CurrentUserData } from '../auth/types';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { plainToInstance } from 'class-transformer';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @ApiTags('users')
 @ApiBearerAuth('bearerAuth')
@@ -24,13 +26,9 @@ export class UsersController {
   async getMe(@CurrentUser() user: CurrentUserData) {
     const found = await this.usersService.findOneById(user.id);
     if (!found) throw new NotFoundException('User not found');
-    return {
-      id: found.id,
-      username: found.username,
-      role: found.role,
-      apiId: found.apiId,
-      isPublic: found.isPublic,
-    };
+    return plainToInstance(UserResponseDto, found, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Patch()
@@ -39,12 +37,8 @@ export class UsersController {
     @Body() dto: UpdateUserDto,
   ) {
     const updated = await this.usersService.updateSelf(user.id, dto);
-    return {
-      id: updated.id,
-      username: updated.username,
-      role: updated.role,
-      apiId: updated.apiId,
-      isPublic: updated.isPublic,
-    };
+    return plainToInstance(UserResponseDto, updated, {
+      excludeExtraneousValues: true,
+    });
   }
 }
