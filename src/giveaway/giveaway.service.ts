@@ -31,7 +31,7 @@ export class GiveawayService {
     private readonly pushService: GiveawayPushService,
   ) {}
 
-  async create(user: CurrentUserData, dto: CreateGiveawayDto) {
+  async create(user: CurrentUserData, dto: CreateGiveawayDto): Promise<Giveaway> {
     const { dino, activeAt, trials, isCanceled, server, slot } = dto;
     const giveaway = this.giveawayRepository.create({
       dino,
@@ -47,10 +47,10 @@ export class GiveawayService {
     return this.giveawayRepository.findOne({
       where: { id: saved.id },
       relations: { creator: true, recipient: true },
-    });
+    }) as Promise<Giveaway>;
   }
 
-  findAll(options?: FindManyOptions<Giveaway>) {
+  findAll(options?: FindManyOptions<Giveaway>): Promise<Giveaway[]> {
     return this.giveawayRepository.find({
       ...options,
       relations: { creator: true, recipient: true },
@@ -70,7 +70,7 @@ export class GiveawayService {
     id: string,
     dto: UpdateGiveawayDto,
     options?: FindOneOptions<Giveaway>,
-  ) {
+  ): Promise<Giveaway> {
     const giveaway = await this.giveawayRepository.findOne({
       ...options,
       where: { id, ...(options?.where as object | undefined) },
@@ -95,7 +95,7 @@ export class GiveawayService {
     return this.giveawayRepository.save(giveaway);
   }
 
-  searchPublic(usernameSearch: string) {
+  searchPublic(usernameSearch: string): Promise<Giveaway[]> {
     return this.giveawayRepository
       .createQueryBuilder('giveaway')
       .leftJoinAndSelect('giveaway.creator', 'creator')
@@ -112,7 +112,7 @@ export class GiveawayService {
     return this.giveawayRepository.delete(id);
   }
 
-  async claim(id: string, user: CurrentUserData) {
+  async claim(id: string, user: CurrentUserData): Promise<Giveaway> {
     return await this.dataSource.transaction(async (manager: EntityManager) => {
       const gRepo = manager.getRepository(Giveaway);
 

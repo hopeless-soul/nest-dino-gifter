@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  NotFoundException,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
@@ -12,6 +22,8 @@ import { UsersService } from '../users/users.service';
 import { toCurrentUserData } from '../auth/types';
 import type { CurrentUserData } from '../auth/types';
 import { User } from '../users/entities/user.entity';
+import { GiveawayResponseDto } from './dto/giveaway-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('admin / giveaway')
 @ApiBearerAuth('bearerAuth')
@@ -25,30 +37,62 @@ export class AdminGiveawayController {
   ) {}
 
   @Post()
-  createForCurrentUser(@CurrentUser() user: CurrentUserData, @Body() createGiveawayDto: CreateGiveawayDto) {
-    return this.giveawayService.create(user, createGiveawayDto);
+  async createForCurrentUser(
+    @CurrentUser() user: CurrentUserData,
+    @Body() createGiveawayDto: CreateGiveawayDto,
+  ): Promise<GiveawayResponseDto> {
+    const gw = await this.giveawayService.create(user, createGiveawayDto);
+    return plainToInstance(GiveawayResponseDto, gw, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Post(':id')
-  async createForSpecificUser(@Param('id', ParseUUIDPipe) id: string, @Body() createGiveawayDto: CreateGiveawayDto) {
+  async createForSpecificUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() createGiveawayDto: CreateGiveawayDto,
+  ): Promise<GiveawayResponseDto> {
     const user = await this.usersService.findOneById(id);
     if (!user) throw new NotFoundException('User not found');
-    if (user.deletedAt !== null) throw new NotFoundException('Account is inactive');
-    return this.giveawayService.create(toCurrentUserData(user), createGiveawayDto);
+    if (user.deletedAt !== null)
+      throw new NotFoundException('Account is inactive');
+    const gw = this.giveawayService.create(
+      toCurrentUserData(user),
+      createGiveawayDto,
+    );
+    return plainToInstance(GiveawayResponseDto, gw, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get()
-  findAll() {
-    return this.giveawayService.findAll();
+  async findAll(): Promise<GiveawayResponseDto[]> {
+    const gws = await this.giveawayService.findAll();
+    return gws.map((gw) =>
+      plainToInstance(GiveawayResponseDto, gw, {
+        excludeExtraneousValues: true,
+      }),
+    );
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.giveawayService.findOne(id);
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<GiveawayResponseDto> {
+    const gw = await this.giveawayService.findOne(id);
+    return plainToInstance(GiveawayResponseDto, gw, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateGiveawayDto: UpdateGiveawayDto) {
-    return this.giveawayService.update(id, updateGiveawayDto);
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateGiveawayDto: UpdateGiveawayDto,
+  ): Promise<GiveawayResponseDto> {
+    const gw = await this.giveawayService.update(id, updateGiveawayDto);
+    return plainToInstance(GiveawayResponseDto, gw, {
+      excludeExtraneousValues: true,
+    });
   }
 }
