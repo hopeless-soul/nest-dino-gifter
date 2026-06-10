@@ -8,7 +8,8 @@ import { HashingModule } from './common/hashing/common/hashing.module';
 import { AuthModule } from './auth/auth.module';
 import { GiveawayModule } from './giveaway/giveaway.module';
 import { PusherModule } from './pusher/pusher.module';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -39,6 +40,6 @@ import { ThrottlerModule } from '@nestjs/throttler';
     PusherModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
