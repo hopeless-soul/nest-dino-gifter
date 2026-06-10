@@ -20,6 +20,7 @@ export class GiveawayController {
 
   @Post()
   @Roles(Role.Operator, Role.Admin)
+  @HttpCode(HttpStatus.CREATED)
   create(@CurrentUser() user: CurrentUserData, @Body() createGiveawayDto: CreateGiveawayDto) {
     return this.giveawayService.create(user, createGiveawayDto);
   }

@@ -10,6 +10,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UsersService } from '../users/users.service';
 import { toCurrentUserData } from '../auth/types';
+import type { CurrentUserData } from '../auth/types';
 import { User } from '../users/entities/user.entity';
 
 @ApiTags('admin / giveaway')
@@ -24,12 +25,12 @@ export class AdminGiveawayController {
   ) {}
 
   @Post()
-  createForCurrentUser(@CurrentUser() user, @Body() createGiveawayDto: CreateGiveawayDto) {
+  createForCurrentUser(@CurrentUser() user: CurrentUserData, @Body() createGiveawayDto: CreateGiveawayDto) {
     return this.giveawayService.create(user, createGiveawayDto);
   }
 
   @Post(':id')
-  async createForSpecificUser(@Param('id', ParseUUIDPipe) id, @Body() createGiveawayDto: CreateGiveawayDto) {
+  async createForSpecificUser(@Param('id', ParseUUIDPipe) id: string, @Body() createGiveawayDto: CreateGiveawayDto) {
     const user = await this.usersService.findOneById(id);
     if (!user) throw new NotFoundException('User not found');
     if (user.deletedAt !== null) throw new NotFoundException('Account is inactive');
