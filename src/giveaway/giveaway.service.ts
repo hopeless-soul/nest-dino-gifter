@@ -3,6 +3,7 @@ import {
   MethodNotAllowedException,
   NotFoundException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
 import { UpdateGiveawayDto } from './dto/update-giveaway.dto';
@@ -81,9 +82,13 @@ export class GiveawayService {
     if (activeAt) giveaway.activeAt = activeAt;
     if (trials) giveaway.trials = trials;
     if (isCanceled !== undefined) giveaway.isCanceled = isCanceled;
-    if (completionStatus !== undefined &&
-        !(giveaway.completionStatus === GiveawayCompletionStatus.Processed &&
-          completionStatus === GiveawayCompletionStatus.Failed)) {
+    if (
+      completionStatus !== undefined &&
+      !(
+        giveaway.completionStatus === GiveawayCompletionStatus.Processed &&
+        completionStatus === GiveawayCompletionStatus.Failed
+      )
+    ) {
       giveaway.completionStatus = completionStatus;
     }
 
@@ -116,7 +121,8 @@ export class GiveawayService {
         where: { id, isCanceled: false },
         lock: { mode: 'pessimistic_write' },
       });
-      if (!locked) throw new NotFoundException('Giveaway canceled or not found');
+      if (!locked)
+        throw new NotFoundException('Giveaway canceled or not found');
 
       const now = new Date();
       if (locked.activeAt && now < locked.activeAt)
@@ -127,8 +133,9 @@ export class GiveawayService {
         where: { id },
         relations: { creator: true, recipient: true },
       });
-      if (!gw) throw new NotFoundException('Giveaway canceled or not found');
 
+      // Giveaway's guards
+      if (!gw) throw new NotFoundException('Giveaway canceled or not found');
       if (gw.recipient)
         throw new MethodNotAllowedException('Giveaway has been claimed');
 
@@ -136,14 +143,17 @@ export class GiveawayService {
       const u = await userRepo.findOne({
         where: { id: user.id },
       });
+
+      // User's guards
       if (!u) throw new UnauthorizedException('User is not valid');
+      if (!u.apiId)
+        throw new UnprocessableEntityException('User has no API ID configured');
 
       gw.recipient = u;
       gw.completionStatus = GiveawayCompletionStatus.Pending;
       const saved = await gRepo.save(gw);
 
-      if (!u.apiId) throw new NotFoundException('User\s api ID is not valid')
-
+      // Push owner to perform gift action
       await this.pushService.emitGiftDino(gw.creator.id, {
         giveawayId: gw.id,
         dino: gw.dino,
