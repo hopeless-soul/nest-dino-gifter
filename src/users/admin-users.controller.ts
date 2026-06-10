@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -67,6 +68,7 @@ export class AdminUsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<AdminUserResponseDto> {
     const user = await this.usersService.findOneById(id);
+    if (!user) throw new NotFoundException('User not found');
     return plainToInstance(AdminUserResponseDto, user, {
       excludeExtraneousValues: true,
     });
