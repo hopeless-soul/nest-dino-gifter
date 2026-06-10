@@ -1,21 +1,27 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsBoolean, IsDate, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { TrialType } from '../../common/enums/trial.enum';
 
 export class DinoDataDto {
   @ApiProperty()
+  @IsString()
   id: string;
 
   @ApiProperty()
+  @IsString()
   name: string;
 
   @ApiProperty()
+  @IsString()
   growthLabel: string;
 
   @ApiProperty()
+  @IsString()
   server: string;
 
   @ApiProperty()
+  @IsString()
   slot: string;
 }
 
@@ -29,11 +35,15 @@ export class TrialDataDto {
 
 export class CreateGiveawayDto {
   @ApiProperty({ type: DinoDataDto })
+  @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => DinoDataDto)
   dino: DinoDataDto;
 
   @ApiPropertyOptional({ type: Date, nullable: true })
   @IsDate()
   @IsOptional()
+  @Type(() => Date)
   activeAt?: Date | null;
 
   @ApiPropertyOptional({ type: [TrialDataDto], nullable: true })
