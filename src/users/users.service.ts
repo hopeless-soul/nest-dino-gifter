@@ -133,19 +133,22 @@ export class UsersService {
   }
 
   async update(id: string, dto: UpdateAdminUserDto) {
-    const user = await this.findOneById(id);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    return this.dataSource.transaction(async (manager) => {
+      const repo = manager.getRepository(User);
+      const user = await repo.findOne({ where: { id } });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
 
-    const { username, password, role, apiId } = dto;
-    if (username) user.username = username;
-    if (password) user.password = await this.hashingService.hash(password);
-    if (apiId !== undefined) user.apiId = apiId === '' ? null : apiId;
-    if (role) user.role = role;
-    if (dto.isPublic !== undefined) user.isPublic = dto.isPublic;
+      const { username, password, role, apiId } = dto;
+      if (username) user.username = username;
+      if (password) user.password = await this.hashingService.hash(password);
+      if (apiId !== undefined) user.apiId = apiId === '' ? null : apiId;
+      if (role) user.role = role;
+      if (dto.isPublic !== undefined) user.isPublic = dto.isPublic;
 
-    return this.userRepository.save(user);
+      return repo.save(user);
+    });
   }
 
   async incrementTokenVersion(id: string): Promise<void> {
