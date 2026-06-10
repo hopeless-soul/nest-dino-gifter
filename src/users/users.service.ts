@@ -87,7 +87,7 @@ export class UsersService {
         return saved;
       } catch (error: any) {
         if (error?.code === '23505') {
-          throw new ConflictException('Email already exists');
+          throw new ConflictException('Username already exists');
         }
         throw error;
       }
