@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PusherService } from './pusher.service';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { AuthType } from '../auth/enums/auth-type.enum';
@@ -8,6 +8,7 @@ import type { CurrentUserData } from '../auth/types';
 import { PusherAuthDto } from './dto/pusher-auth.dto';
 
 @ApiTags('pusher')
+@ApiBearerAuth('access_token')
 @Controller('pusher')
 export class PusherController {
   constructor(private readonly pusherService: PusherService) {}

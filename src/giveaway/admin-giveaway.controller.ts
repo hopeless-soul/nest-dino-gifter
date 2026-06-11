@@ -27,7 +27,7 @@ import { GiveawayResponseDto } from './dto/giveaway-response.dto';
 import { plainToInstance } from 'class-transformer';
 
 @ApiTags('admin / giveaway')
-@ApiBearerAuth('bearerAuth')
+@ApiBearerAuth('access_token')
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 @Controller('admin/giveaway')

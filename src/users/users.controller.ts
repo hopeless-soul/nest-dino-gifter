@@ -16,7 +16,7 @@ import { plainToInstance } from 'class-transformer';
 import { UserResponseDto } from './dto/user-response.dto';
 
 @ApiTags('users')
-@ApiBearerAuth('bearerAuth')
+@ApiBearerAuth('access_token')
 @Controller('users')
 @Auth(AuthType.Bearer)
 export class UsersController {

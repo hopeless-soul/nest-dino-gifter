@@ -26,7 +26,7 @@ import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
 
 @Controller('admin/users')
 @ApiTags('admin / users')
-@ApiBearerAuth('bearerAuth')
+@ApiBearerAuth('access_token')
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 export class AdminUsersController {

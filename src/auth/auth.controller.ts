@@ -55,7 +55,7 @@ export class AuthController {
   @Post('logout')
   @Auth(AuthType.Bearer)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiBearerAuth('bearerAuth')
+  @ApiBearerAuth('access_token')
   @ApiResponse({ status: 204, description: 'Logged out successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async logout(
