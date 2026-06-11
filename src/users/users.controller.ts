@@ -5,7 +5,7 @@ import {
   NotFoundException,
   Patch,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { AuthType } from '../auth/enums/auth-type.enum';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -15,7 +15,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { UserResponseDto } from './dto/user-response.dto';
 
-@ApiTags('users')
+@ApiTags('Users')
 @ApiBearerAuth('access_token')
 @Controller('users')
 @Auth(AuthType.Bearer)
@@ -23,6 +23,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
+  @ApiOperation({ summary: 'Get current user', description: 'Returns the authenticated user\'s profile including their created and won giveaways.' })
   @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -35,6 +36,7 @@ export class UsersController {
   }
 
   @Patch()
+  @ApiOperation({ summary: 'Update profile', description: 'Updates the authenticated user\'s public visibility setting or linked API ID.' })
   @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

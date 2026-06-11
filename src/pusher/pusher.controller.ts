@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { PusherService } from './pusher.service';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { AuthType } from '../auth/enums/auth-type.enum';
@@ -7,7 +7,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { CurrentUserData } from '../auth/types';
 import { PusherAuthDto } from './dto/pusher-auth.dto';
 
-@ApiTags('pusher')
+@ApiTags('Pusher')
 @ApiBearerAuth('access_token')
 @Controller('pusher')
 export class PusherController {
@@ -15,6 +15,7 @@ export class PusherController {
 
   @Post('auth')
   @Auth(AuthType.Bearer)
+  @ApiOperation({ summary: 'Authenticate channel', description: 'Returns a Pusher auth token for the authenticated user\'s private channel. Rejects requests for any other channel.' })
   @ApiResponse({ status: 200, description: 'Pusher channel auth token' })
   @ApiResponse({ status: 401, description: 'Unauthorized or channel not allowed' })
   auth(

@@ -34,6 +34,13 @@ async function bootstrap() {
       },
       'access_token',
     )
+    .addTag('Health', 'Service liveness check')
+    .addTag('Auth', 'Registration and login')
+    .addTag('Users', 'Authenticated user profile')
+    .addTag('Admin – Users', 'Admin: user management')
+    .addTag('Giveaway', 'Giveaway creation, search, and claiming')
+    .addTag('Admin – Giveaway', 'Admin: full giveaway management')
+    .addTag('Pusher', 'Pusher channel authentication')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

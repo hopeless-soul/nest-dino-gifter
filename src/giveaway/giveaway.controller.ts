@@ -10,7 +10,7 @@ import {
   HttpCode,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
 import { UpdateGiveawayDto } from './dto/update-giveaway.dto';
@@ -24,7 +24,7 @@ import type { CurrentUserData } from '../auth/types';
 import { GiveawayResponseDto } from './dto/giveaway-response.dto';
 import { plainToInstance } from 'class-transformer';
 
-@ApiTags('giveaway')
+@ApiTags('Giveaway')
 @ApiBearerAuth('access_token')
 @Auth(AuthType.Bearer)
 @Controller('giveaway')
@@ -34,6 +34,7 @@ export class GiveawayController {
   @Post()
   @Roles(Role.Operator, Role.Admin)
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create giveaway', description: 'Creates a new giveaway owned by the authenticated user. Restricted to Operators and Admins.' })
   @ApiResponse({ status: 201, type: GiveawayResponseDto })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -50,6 +51,7 @@ export class GiveawayController {
 
   @Get()
   @Roles(Role.Operator, Role.Admin)
+  @ApiOperation({ summary: 'List my giveaways', description: 'Returns all giveaways created by the authenticated user, ordered by creation date descending.' })
   @ApiResponse({ status: 200, type: GiveawayResponseDto, isArray: true })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -68,6 +70,7 @@ export class GiveawayController {
   }
 
   @Get('won')
+  @ApiOperation({ summary: 'List won giveaways', description: 'Returns all giveaways that were claimed by the authenticated user.' })
   @ApiResponse({ status: 200, type: GiveawayResponseDto, isArray: true })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findWon(
@@ -85,6 +88,7 @@ export class GiveawayController {
 
   @Get('search')
   @Auth(AuthType.None)
+  @ApiOperation({ summary: 'Search giveaways', description: 'Public endpoint. Returns giveaways matching a creator username search. No authentication required.' })
   @ApiResponse({ status: 200, type: GiveawayResponseDto, isArray: true })
   async searchPublic(@Query() query: SearchGiveawayQueryDto) {
     const gws = await this.giveawayService.searchPublic(query.usernameSearch);
@@ -96,6 +100,7 @@ export class GiveawayController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get giveaway', description: 'Returns a single giveaway by ID.' })
   @ApiResponse({ status: 200, type: GiveawayResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Giveaway not found' })
@@ -110,6 +115,7 @@ export class GiveawayController {
 
   @Patch(':id')
   @Roles(Role.Operator, Role.Admin)
+  @ApiOperation({ summary: 'Update giveaway', description: 'Updates a giveaway. Only the creator can update their own giveaways.' })
   @ApiResponse({ status: 200, type: GiveawayResponseDto })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -130,6 +136,7 @@ export class GiveawayController {
 
   @Post(':id')
   @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ summary: 'Claim giveaway', description: 'Claims an available giveaway on behalf of the authenticated user. Returns 404 if the giveaway does not exist.' })
   @ApiResponse({ status: 202, type: GiveawayResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Giveaway not found' })

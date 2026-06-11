@@ -10,7 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
 import { CreateGiveawayDto } from './dto/create-giveaway.dto';
 import { UpdateGiveawayDto } from './dto/update-giveaway.dto';
@@ -26,7 +26,7 @@ import { User } from '../users/entities/user.entity';
 import { GiveawayResponseDto } from './dto/giveaway-response.dto';
 import { plainToInstance } from 'class-transformer';
 
-@ApiTags('admin / giveaway')
+@ApiTags('Admin – Giveaway')
 @ApiBearerAuth('access_token')
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
@@ -39,6 +39,7 @@ export class AdminGiveawayController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create giveaway', description: 'Creates a giveaway attributed to the authenticated admin.' })
   @ApiResponse({ status: 201, type: GiveawayResponseDto })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -55,6 +56,7 @@ export class AdminGiveawayController {
 
   @Post(':id')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create giveaway for user', description: 'Creates a giveaway attributed to the specified user. Returns 404 if the user does not exist or is inactive.' })
   @ApiResponse({ status: 201, type: GiveawayResponseDto })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -78,6 +80,7 @@ export class AdminGiveawayController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'List all giveaways', description: 'Returns all giveaways across all users.' })
   @ApiResponse({ status: 200, type: GiveawayResponseDto, isArray: true })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -91,6 +94,7 @@ export class AdminGiveawayController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get giveaway', description: 'Returns a single giveaway by ID.' })
   @ApiResponse({ status: 200, type: GiveawayResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -105,6 +109,7 @@ export class AdminGiveawayController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update giveaway', description: 'Updates any giveaway regardless of creator. Admins only.' })
   @ApiResponse({ status: 200, type: GiveawayResponseDto })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

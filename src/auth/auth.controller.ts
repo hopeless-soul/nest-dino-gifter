@@ -6,7 +6,7 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiBearerAuth, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { TokensResponseDto } from './dto/tokens-response.dto';
 import { ConfigService } from '@nestjs/config';
@@ -18,7 +18,7 @@ import type { Request, Response } from 'express';
 import { CreateLocalUserDto } from '../users/dto/create-local-user.dto';
 import { LoginDto } from './dto/login.dto';
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -29,6 +29,7 @@ export class AuthController {
   @Post('login')
   @Auth(AuthType.Local)
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login', description: 'Authenticates with username and password. Returns an access_token and sets an httpOnly cookie.' })
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 200, type: TokensResponseDto })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
@@ -45,6 +46,7 @@ export class AuthController {
   @Post('register')
   @Auth(AuthType.None)
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Register', description: 'Creates a new user account with the Regular role.' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 409, description: 'Username already taken' })
@@ -56,6 +58,7 @@ export class AuthController {
   @Auth(AuthType.Bearer)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth('access_token')
+  @ApiOperation({ summary: 'Logout', description: 'Invalidates the current session and clears the access_token cookie.' })
   @ApiResponse({ status: 204, description: 'Logged out successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async logout(
