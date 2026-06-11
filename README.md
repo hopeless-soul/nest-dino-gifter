@@ -2,6 +2,8 @@
 
 Backend REST API for the Dino Gifter platform — a game-integrated service where users create dino giveaways that others can claim in real time.
 
+![Swagger UI](docs/dino-gifter-swagger.jpg)
+
 ## Technology Stack
 
 | Layer | Technology |
