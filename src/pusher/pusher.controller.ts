@@ -5,6 +5,7 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { AuthType } from '../auth/enums/auth-type.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { CurrentUserData } from '../auth/types';
+import { PusherAuthDto } from './dto/pusher-auth.dto';
 
 @ApiTags('pusher')
 @Controller('pusher')
@@ -17,14 +18,13 @@ export class PusherController {
   @ApiResponse({ status: 401, description: 'Unauthorized or channel not allowed' })
   auth(
     @CurrentUser() user: CurrentUserData,
-    @Body('socket_id') socketId: string,
-    @Body('channel_name') channelName: string,
+    @Body() dto: PusherAuthDto,
   ) {
     // Only allow subscribing to the user's own private channel
     const expectedChannel = `private-user-${user.id}`;
-    if (channelName !== expectedChannel) {
+    if (dto.channel_name !== expectedChannel) {
       throw new UnauthorizedException('Channel not allowed');
     }
-    return this.pusherService.authenticateChannel(socketId, channelName);
+    return this.pusherService.authenticateChannel(dto.socket_id, dto.channel_name);
   }
 }

@@ -112,6 +112,7 @@ export class UsersService {
 
     return this.userRepository.find({
       where,
+      withDeleted: isDeleted === true,
       relations: { createdGiveaways: true, wonGiveaways: true },
     });
   }

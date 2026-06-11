@@ -95,15 +95,12 @@ export class AuthService {
       throw new NotFoundException('Current user is not found');
     }
 
-    const [at] = await Promise.all([
-      // Access Token JWT
-      this.signToken<Partial<AccessTokenPayload>>(
-        user.id,
-        this.configService.getOrThrow<string>('JWT_SECRET'),
-        parseInt(this.configService.getOrThrow('JWT_ACCESS_TOKEN_TTL')),
-        { ...rest, tokenVersion: currentData.tokenVersion },
-      ),
-    ]);
+    const at = await this.signToken<Partial<AccessTokenPayload>>(
+      user.id,
+      this.configService.getOrThrow<string>('JWT_SECRET'),
+      parseInt(this.configService.getOrThrow('JWT_ACCESS_TOKEN_TTL')),
+      { ...rest, tokenVersion: currentData.tokenVersion },
+    );
 
     return {
       access_token: at,

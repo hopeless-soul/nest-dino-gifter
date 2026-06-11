@@ -32,7 +32,7 @@ export class Giveaway {
   @Column({ type: 'varchar', nullable: true, default: null })
   slot: string | null;
 
-  @Column({ enum: GiveawayCompletionStatus, default: GiveawayCompletionStatus.NotProcessed }) 
+  @Column({ type: 'enum', enum: GiveawayCompletionStatus, default: GiveawayCompletionStatus.NotProcessed })
   completionStatus: GiveawayCompletionStatus;
 
   // Timestamps

@@ -5,9 +5,10 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   ParseUUIDPipe,
   NotFoundException,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { GiveawayService } from './giveaway.service';
@@ -37,6 +38,7 @@ export class AdminGiveawayController {
   ) {}
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   @ApiResponse({ status: 201, type: GiveawayResponseDto })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -52,6 +54,7 @@ export class AdminGiveawayController {
   }
 
   @Post(':id')
+  @HttpCode(HttpStatus.CREATED)
   @ApiResponse({ status: 201, type: GiveawayResponseDto })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
